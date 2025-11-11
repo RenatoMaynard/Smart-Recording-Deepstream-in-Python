@@ -1,6 +1,6 @@
 # Smart-Recording-Deepstream-in-Python
 Guide to set up DeepStream `pyds` and run an RTSP pipeline in Python.  
-**Note:** NVIDIA Smart Recording isn’t in official Python bindings and is supported only in C++. This guide includes the minimal code tweaks so you can enable Smart Recording from Python.
+**Note:** NVIDIA Smart Recording isn’t in official Python bindings and is supported only in C++. This guide includes the minimal code tweaks so you can enable Smart Recording from Python. Additionally, We’d love your help making this repo a one-stop place for DeepStream wheels with Smart-Record. If you’ve successfully built a wheel that works on your setup, please open a Pull Request and add it so others can use it too!
 
 ---
 
