@@ -314,3 +314,47 @@ PY
   python3 -m build
   cd dist && python3 -m pip install --force-reinstall *.whl
   ~~~
+
+---
+
+### Contribute Your Prebuilt Wheels
+
+We’d love your help making this repo a one-stop place for DeepStream wheels.  
+If you’ve successfully built a wheel that works on your setup, please open a Pull Request and add it so others can use it too!
+
+## What to contribute
+- **Wheel file** (`.whl`) built for a specific stack (DeepStream/JetPack/Ubuntu), architecture, and Python version.
+- **Checksums**: a `SHA256SUMS.txt` in the same folder as the wheel, and (if possible) update the root `SHA256SUMS.txt`.
+- *(Optional)* **Constraints file** if special pins are needed (e.g., `numpy==1.26.0`).
+
+## Folder layout (must follow this)
+```shell
+wheels/<package>/<version>/
+└── DS-<DS_MAJOR.MINOR>_JP<JP_MAJOR.MINOR>_UBU<UBUNTU_MAJOR.MINOR>/
+    └── <arch>/
+        └── cp<PYMAJMIN>/
+            ├── <original-wheel-name>.whl
+            └── SHA256SUMS.txt
+```
+
+**Notes**
+- `arch` is `linux_x86_64` (PC) or `aarch64` (Jetson).
+- `cp312` = Python 3.12; `cp310` = Python 3.10, etc.
+- Keep the **original wheel filename** intact.
+
+## Include compatibility info in your PR
+- DeepStream version (e.g., `DS 8.0` or `DS 7.1`)
+- JetPack & Ubuntu (e.g., `JP 6.1 / Ubuntu 22.04`)
+- Python version (e.g., `3.12`)
+- Architecture (`x86_64` or `aarch64`)
+- Any special constraints (e.g., `numpy==1.26.0`)
+
+
+## Quick PR checklist
+- Wheel placed in the correct folder structure.
+- Short compatibility section in the PR description.
+
+Thanks for sharing your builds—your contribution helps the whole community install reliably without rebuilding! 🙌
+
+
+
