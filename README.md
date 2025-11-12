@@ -36,6 +36,8 @@ After installation, you should have a path like:
 /opt/nvidia/deepstream/deepstream-X.X
 ~~~
 
+**NOTICE THAT** `X.X` **IS YOUR DEEPSTREAM VERSION**, please edit according your version (e.g `7.1`,`8.0`)
+
 ### System Dependencies
 Install development packages required to build the bindings and gst-python:
 ~~~bash
@@ -59,7 +61,7 @@ python3 -m pip install build
 ---
 
 ## Clone in the Correct Location
-DeepStream expects the Python apps under `sources/`.
+DeepStream expects the Python apps under `sources/`. **NOTICE THAT** `X.X` **IS YOUR DEEPSTREAM VERSION**, please edit according your version (e.g `7.1`,`8.0`)
 ~~~bash
 export DS_ROOT=/opt/nvidia/deepstream/deepstream-X.X
 sudo mkdir -p "$DS_ROOT/sources"
