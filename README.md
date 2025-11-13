@@ -3,10 +3,13 @@ Guide to set up DeepStream `pyds` and run an RTSP pipeline in Python with Smart 
 **Note:** NVIDIA Smart Recording isn’t in official Python bindings and is supported only in C++. NVIDIA Smart Video Record isn’t in the official Python bindings and is supported only in C++. This guide includes the minimal tweaks to enable Smart Video Recording from Python, and we’ve added a complete example script that shows how to trigger start/stop, handle the sr-done callback, and save clips to disk. We’d love your help making this repo a one-stop place for DeepStream wheels with Smart-Record—if you’ve built a working wheel for your setup, please open a Pull Request so others can use it too!
 
 ---
-
+Depeding of the version you are trying to install
 # DeepStream Python Bindings (dspy) — Install & Build
 **Ubuntu 22.04 · Python 3.10 · DeepStream 7.1**  
 > Python **3.10** is required (3.8 **will not** work).
+
+**Ubuntu 24.04 · Python 3.12 · DeepStream 8.0**  
+> Python **3.12** is required (3.8 **will not** work).
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
