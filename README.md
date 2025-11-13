@@ -225,18 +225,18 @@ Replace the existing macro with:
 ## Edit CMakeLists txt
 Update the build system to target the version  you need e.g. **CMake 3.10**, **Python 3.10**, and (optionally) a versioned DeepStream path.
 
-**Require CMake 3.10 (was 3.12)**
+**e.g Require CMake 3.10 (was 3.12)**
 ~~~cmake
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 ~~~
 
-**Default Python version: 3.10 (was 3.12)**
+**e.g Default Python version: 3.10 (was 3.12)**
 ~~~cmake
 check_variable_set(PYTHON_MAJOR_VERSION 3)
 check_variable_set(PYTHON_MINOR_VERSION 10)
 ~~~
 
-**Allowed Python minor version: 10 (was 12)**
+**e.g Allowed Python minor version: 10 (was 12)**
 ~~~cmake
 set(PYTHON_MINVERS_ALLOWED 10)
 check_variable_allowed(PYTHON_MINOR_VERSION PYTHON_MINVERS_ALLOWED)
@@ -257,7 +257,7 @@ check_variable_set(DS_PATH "/opt/nvidia/deepstream/deepstream-${DS_VERSION}")
 ## Compiling the bindings
 > Output: a Python wheel under `bindings/dist/` that you can install with `pip`.
 
-### x86 (Ubuntu 22.04 · Python 3.10 · DeepStream 7.1)
+### x86 (Ubuntu 2X.04 · Python 3.1X · DeepStream X.X)
 ~~~bash
 cd "$DS_ROOT/sources/deepstream_python_apps/bindings"
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
@@ -266,7 +266,7 @@ cd dist
 python3 -m pip install --force-reinstall *.whl
 ~~~
 
-### Jetson (Ubuntu 22.04 · Python 3.10 · DeepStream 7.1)
+### Jetson (Ubuntu 2X.04 · Python 3.1X · DeepStream X.X)
 ~~~bash
 cd "$DS_ROOT/sources/deepstream_python_apps/bindings"
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
@@ -275,7 +275,7 @@ cd dist
 python3 -m pip install --force-reinstall *.whl
 ~~~
 
-### SBSA (Ubuntu 22.04 · Python 3.10 · DeepStream 7.1)
+### SBSA (Ubuntu 2X.04 · Python 3.1X · DeepStream X.X)
 ~~~bash
 cd "$DS_ROOT/sources/deepstream_python_apps/bindings"
 export CMAKE_ARGS="-DIS_SBSA=on"
