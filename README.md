@@ -107,97 +107,117 @@ sudo ninja install
 Make the following **source additions** to enable Smart Recording–related types and helpers. This files are already ready to use in the folder `bindings`, so you can just replace the files.
 
 ### File: `bindings/src/bindfunctions.cpp`
-Paste these inside the existing `namespace pydeepstream { ... }` where other `m.def(...)` calls live.
-~~~cpp
-m.def("set_user_meta_release_callback",
-      [](NvDsUserMeta *meta,
-         std::function<utils::RELEASEFUNC_SIG> const &func) {
-          utils::set_freefunc(meta, func);
-      },
-      py::call_guard<py::gil_scoped_release>(),
-      "meta"_a,
-      "func"_a,
-      pydsdoc::methodsDoc::user_releasefunc);
-
-m.def("unset_callback_funcs",
-      []() { utils::release_all_func(); },
-      py::call_guard<py::gil_scoped_release>());
-
-m.def("get_ptr",
-      [](size_t ptr) { return (gpointer)ptr; },
-      "ptr"_a,
-      py::return_value_policy::reference,
-      pydsdoc::methodsDoc::get_ptr);
-
-// NEW alias for clarity
-m.def("get_native_ptr",
-      [](size_t ptr) { return (gpointer)ptr; },
-      "ptr"_a,
-      py::return_value_policy::reference,
-      pydsdoc::methodsDoc::get_ptr);
-
-m.def("strdup",
-      [](size_t ptr) -> size_t {
-          char *str = (char *)ptr;
-          if (!str) return 0;
-          char *dup = g_strdup(str);
-          return (size_t)dup;
-      },
-      "ptr"_a,
-      pydsdoc::methodsDoc::strdup);
-~~~
+Apply the following changes to `bindings/src/bindfunctions.cpp`:
+```diff
+diff --git a/bindings/src/bindfunctions.cpp b/bindings/src/bindfunctions.cpp
+index eade8d5..7a4b459 100644
+--- a/bindings/src/bindfunctions.cpp
++++ b/bindings/src/bindfunctions.cpp
+@@ -586,7 +586,7 @@ namespace pydeepstream {
+                  std::function<utils::RELEASEFUNC_SIG> const &func) {
+                   utils::set_freefunc(meta, func);
+               },
+-             py::call_guard<py::gil_scoped_release>(),
++              py::call_guard<py::gil_scoped_release>(),
+               "meta"_a,
+               "func"_a,
+               pydsdoc::methodsDoc::user_releasefunc);
+@@ -601,10 +601,9 @@ namespace pydeepstream {
+         // Required for backward compatibility
+         m.def("unset_callback_funcs",
+               []() {
+-            utils::release_all_func();
+-        },
+-              py::call_guard<py::gil_scoped_release>()
+-       );
++                  utils::release_all_func();
++              },
++              py::call_guard<py::gil_scoped_release>());
+ 
+         m.def("alloc_char_buffer",
+               [](size_t size) {
+@@ -650,6 +649,14 @@ namespace pydeepstream {
+               py::return_value_policy::reference,
+               pydsdoc::methodsDoc::get_ptr);
+ 
++        m.def("get_native_ptr",
++              [](size_t ptr) {
++                  return (gpointer) ptr;
++              },
++              "ptr"_a,
++              py::return_value_policy::reference,
++              pydsdoc::methodsDoc::get_ptr);
++
+         m.def("strdup",
+               [](size_t ptr) -> size_t {
+                   char *str = (char *) ptr;
+```
 
 ### File: `bindings/src/utils.cpp`
-Add this include near the other DeepStream headers:
-~~~cpp
-#include "gst-nvdssr.h"
-~~~
+Apply the following changes to `bindings/src/utils.cpp`
 
-Then add these bindings (e.g., after the existing `NvDsObjEncUsrArgs` bindings):
-~~~cpp
-// Enum for Smart Record container type
-py::enum_<NvDsSRContainerType>(m, "NvDsSRContainerType")
-    .value("NVDSSR_CONTAINER_MP4", NVDSSR_CONTAINER_MP4)
-    .value("NVDSSR_CONTAINER_MKV", NVDSSR_CONTAINER_MKV)
-    .export_values();
-
-// Smart Record info struct
-py::class_<NvDsSRRecordingInfo>(m, "NvDsSRRecordingInfo")
-    .def(py::init<>())
-    .def_property("filename", STRING_FREE_EXISTING(NvDsSRRecordingInfo, filename))
-    .def_property("dirpath",  STRING_FREE_EXISTING(NvDsSRRecordingInfo, dirpath))
-    .def_readwrite("duration",       &NvDsSRRecordingInfo::duration)
-    .def_readwrite("containerType",  &NvDsSRRecordingInfo::containerType)
-    .def_readwrite("width",          &NvDsSRRecordingInfo::width)
-    .def_readwrite("height",         &NvDsSRRecordingInfo::height)
-    .def_readwrite("containsVideo",  &NvDsSRRecordingInfo::containsVideo)
-    .def_readwrite("channels",       &NvDsSRRecordingInfo::channels)
-    .def_readwrite("samplingRate",   &NvDsSRRecordingInfo::samplingRate)
-    .def_readwrite("containsAudio",  &NvDsSRRecordingInfo::containsAudio)
-    .def("cast", [](size_t data) {
-            return (NvDsSRRecordingInfo *)data;
-         }, py::return_value_policy::reference)
-    .def("cast", [](void* data) {
-            return (NvDsSRRecordingInfo *)data;
-         }, py::return_value_policy::reference);
-
-// Helper for user context in SR callbacks
-struct SRUserContext {
-    int  sessionid;
-    char name[32];
-};
-
-py::class_<SRUserContext>(m, "SRUserContext")
-    .def(py::init<>())
-    .def_readwrite("sessionid", &SRUserContext::sessionid)
-    .def_property("name", STRING_CHAR_ARRAY(SRUserContext, name))
-    .def("cast", [](size_t data) {
-            return (SRUserContext *)data;
-         }, py::return_value_policy::reference)
-    .def("cast", [](void* data) {
-            return (SRUserContext *)data;
-         }, py::return_value_policy::reference);
-~~~
+```diff
+diff --git a/bindings/src/utils.cpp b/bindings/src/utils.cpp
+index 9f97794..009314a 100644
+--- a/bindings/src/utils.cpp
++++ b/bindings/src/utils.cpp
+@@ -28,6 +28,7 @@
+ #include "nvdsmeta_schema.h"
+ #include "utils.hpp"
+ #include "nvds_obj_encode.h"
++#include "gst-nvdssr.h"
+ #include "bind_string_property_definitions.h"
+ #include "../../docstrings/utilsdoc.h"
+ 
+@@ -103,6 +104,48 @@ namespace pydeepstream {
+                      },
+                      py::return_value_policy::reference,
+                      pydsdoc::utilsdoc::NvDsObjEncUsrArgsDoc::cast);
++
++        py::enum_<NvDsSRContainerType>(m, "NvDsSRContainerType")
++                .value("NVDSSR_CONTAINER_MP4", NVDSSR_CONTAINER_MP4)
++                .value("NVDSSR_CONTAINER_MKV", NVDSSR_CONTAINER_MKV)
++                .export_values();
++
++        py::class_<NvDsSRRecordingInfo>(m, "NvDsSRRecordingInfo")
++                .def(py::init<>())
++                .def_property("filename", STRING_FREE_EXISTING(NvDsSRRecordingInfo, filename))
++                .def_property("dirpath", STRING_FREE_EXISTING(NvDsSRRecordingInfo, dirpath))
++                .def_readwrite("duration", &NvDsSRRecordingInfo::duration)
++                .def_readwrite("containerType", &NvDsSRRecordingInfo::containerType)
++                .def_readwrite("width", &NvDsSRRecordingInfo::width)
++                .def_readwrite("height", &NvDsSRRecordingInfo::height)
++                .def_readwrite("containsVideo", &NvDsSRRecordingInfo::containsVideo)
++                .def_readwrite("channels", &NvDsSRRecordingInfo::channels)
++                .def_readwrite("samplingRate", &NvDsSRRecordingInfo::samplingRate)
++                .def_readwrite("containsAudio", &NvDsSRRecordingInfo::containsAudio)
++                .def("cast", [](size_t data) {
++                        return (NvDsSRRecordingInfo *) data;
++                     },
++                     py::return_value_policy::reference)
++                .def("cast", [](void* data) {
++                        return (NvDsSRRecordingInfo *) data;
++                     },
++                     py::return_value_policy::reference);
++        struct SRUserContext {
++            int sessionid;
++            char name[32];
++        };
++        py::class_<SRUserContext>(m, "SRUserContext")
++                .def(py::init<>())
++                .def_readwrite("sessionid", &SRUserContext::sessionid)
++                .def_property("name", STRING_CHAR_ARRAY(SRUserContext, name))
++                .def("cast", [](size_t data) {
++                        return (SRUserContext *) data;
++                     },
++                     py::return_value_policy::reference)
++                .def("cast", [](void* data) {
++                        return (SRUserContext *) data;
++                     },
++                     py::return_value_policy::reference);
+     }
+ }
+```
 
 > Keep all of the above inside `namespace pydeepstream { ... }`.
 
@@ -217,6 +237,8 @@ Replace the existing macro with:
         self.member[sizeof(self.member) - 1] = '\0';                                \
     }
 #endif
+```
+
 ```cpp
 #include <cstdio>   // for std::snprintf
 ```
